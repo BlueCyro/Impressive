@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using Elements.Core;
 using FrooxEngine;
 using Rug.Osc;
@@ -11,26 +12,23 @@ public class SteamLinkDriver : IInputDriver
 {
     private InputInterface? input;
     private Eyes? eyes;
-    private OscPacket? Data
-    {
-        get
-        {
-            lock (_lock)
-            {
-                return latestData;
-            }
-        }
-        set
-        {
-            lock (_lock)
-            {
-                latestData = value;
-            }
-        }
-    }
-    private OscPacket? latestData;
-    private readonly object _lock = new();
+    
     private readonly OSCBridge bridge = new();
+    private readonly SteamFace faceData = new();
+
+    private readonly object _lock = new();
+    
+    public int UpdateOrder => 150;
+    
+    public void CollectDeviceInfos(DataTreeList list)
+    {
+        DataTreeDictionary dict = new();
+
+        dict.Add("Name", "SteamLink Eye Datastream");
+        dict.Add("Type", "Eye Tracking");
+        dict.Add("Model", "SteamLink");
+        list.Add(dict);
+    }
 
     public void RegisterInputs(InputInterface i)
     {
@@ -45,16 +43,37 @@ public class SteamLinkDriver : IInputDriver
 
     void OnNewPacket(object sender, OscPacket packet)
     {
-        Data = packet;
+        if (packet is OscBundle bundle)
+        {
+            lock (_lock)
+            {
+                foreach (OscPacket pckt in bundle)
+                {
+                    if (pckt is OscMessage msg)
+                    {
+                        faceData.TryMapOSC(msg.Address, msg.ToArray());
+                    }
+                }
+            }
+        }
     }
 
     public void UpdateInputs(float dt)
     {
-        if (Data is OscMessage msg)
+        lock (_lock)
         {
-            var objects = msg.ToArray();
-            MemoryMarshal.AsBytes(objects.AsSpan());
+            UpdateEye(faceData.EyeLeft, eyes!.LeftEye);
+            UpdateEye(faceData.EyeRight, eyes!.RightEye);
         }
+    }
+
+    public void UpdateEye(SteamLinkEye source, Eye dest)
+    {
+        dest.Direction = source.EyeDirection;
+        dest.Widen = source.ExpandedSqueeze;
+        dest.Openness = source.Eyelid;
+        dest.PupilDiameter = 0.03f;
+        dest.Squeeze = source.SqueezeToggle;
     }
 
     private void Shutdown()
