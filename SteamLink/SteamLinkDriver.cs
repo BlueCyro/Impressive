@@ -37,6 +37,7 @@ public class SteamLinkDriver : IInputDriver
         {
             eyes = new(input, "Steam Link Datastream");
             bridge.ReceivedPacket += OnNewPacket;
+            Impressive.Port_Config.OnChanged += OnSettingChanged;
             i.Engine.OnShutdown += bridge.StopListen;
         }
     }
@@ -76,6 +77,11 @@ public class SteamLinkDriver : IInputDriver
         dest.Squeeze = source.SqueezeToggle;
     }
 
+    private void OnSettingChanged(object? o)
+    {
+        bridge.StopListen();
+        bridge.TryStartListen();
+    }
     private void Shutdown()
     {
         bridge.ReceivedPacket -= OnNewPacket;

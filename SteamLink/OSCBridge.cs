@@ -12,7 +12,6 @@ public class OSCBridge
     public EventHandler<OscPacket>? ReceivedPacket;
     private Thread? listenThread;
     private CancellationTokenSource tkSrc = new();
-    private ReaderWriterLockSlim slimLock = new();
 
     public bool TryStartListen()
     {
