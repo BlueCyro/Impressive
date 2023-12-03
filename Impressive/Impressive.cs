@@ -4,10 +4,11 @@ using System;
 using System.Reflection;
 using FrooxEngine;
 using Elements.Core;
+using UnityFrooxEngineRunner;
 
 namespace Impressive;
 
-public class Impressive : ResoniteMod
+public partial class Impressive : ResoniteMod
 {
     public override string Name => "Impressive";
     public override string Author => "Cyro";
@@ -21,5 +22,16 @@ public class Impressive : ResoniteMod
         Config = GetConfiguration();
         Config?.Save(true);
         harmony.PatchAll();
+    }
+
+    [HarmonyPatch(typeof(FrooxEngineBootstrap))]
+    public static class Bootstrap_Patch
+    {
+        [HarmonyPatch("RegisterDrivers")]
+        [HarmonyPostfix]
+        public static void RegisterDrivers_Patch(Engine engine, UnityLaunchOptions options)
+        {
+            engine.InputInterface.RegisterInputDriver(new SteamLinkDriver());
+        }
     }
 }
