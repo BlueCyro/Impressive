@@ -19,19 +19,22 @@ public abstract class OSCMappedObject
             }
             
             Console.WriteLine($"Cache miss for {GetType()}");
-            // Get all of the fields on the inherited class which have the "OSCMapAttribute" applied.
-            var fields =
-                GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .Select(f => new { info = f, attr = f.GetCustomAttribute<OSCMapAttribute>() })
-                .Where(f => f.attr != null);
+
+            // Get all of the fields or properties on the inherited class which have the "OSCMapAttribute" applied.
+            var members = GetType()
+                .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
+                .Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+                .Select(m => new { info = m, attr = m.GetCustomAttribute<OSCMapAttribute>() })
+                .Where(m => m.attr != null);
             
+
             Console.WriteLine("Fields instantiated");
 
             // Build efficient accessors for any annotated fields in the inherited classes.
             // This way, we can simply mark each field with a path that an OSC message should be routed to.
             Dictionary<string, Action<OSCMappedObject, object[]>> fieldDict = new();
             Console.WriteLine("Dict instantiated");
-            foreach (var mapped in fields)
+            foreach (var mapped in members)
             {
                 // Define two parameters; one for a mapped object, and another for the object array to pass
                 var targ = Expression.Parameter(typeof(OSCMappedObject), "target");
@@ -39,9 +42,16 @@ public abstract class OSCMappedObject
                 var targInherited = Expression.Convert(targ, GetType()); // Cast the base type to the inherited one since we know it.
 
                 Expression convert;
+                Type memberType = typeof(Type);
+
+                // Store the type of the member
+                if (mapped.info is FieldInfo fieldInfo)
+                    memberType = fieldInfo.FieldType;
+                else if (mapped.info is PropertyInfo propInfo)
+                    memberType = propInfo.PropertyType;
 
                 // Choose which expression to use based on whether an explicit converter exists
-                if (OSCConverters.Converters.TryGetValue(mapped.info.FieldType, out MethodInfo? conv))
+                if (OSCConverters.Converters.TryGetValue(memberType, out MethodInfo? conv))
                 {
                     // If a conversion method is found, use that to convert the value.
                     convert = Expression.Call(null, conv, obj);
@@ -50,12 +60,12 @@ public abstract class OSCMappedObject
                 {
                     // Otherwise, play it safe and try to cast object[0] to whatever type the field is
                     var first = Expression.ArrayAccess(obj, Expression.Constant(0));
-                    convert = Expression.Convert(first, mapped.info.FieldType);
+                    convert = Expression.Convert(first, memberType);
                 }
 
-                // Get the field we're targetting from the inherited class and assign the result of the conversion expression to it.
-                var targField = Expression.Field(targInherited, mapped.info);
-                var objAssign = Expression.Assign(targField, convert);
+                // Get the member we're targetting from the inherited class and assign the result of the conversion expression to it.
+                Expression targMember = Expression.MakeMemberAccess(targInherited, mapped.info);
+                var objAssign = Expression.Assign(targMember, convert);
 
                 // Finally, compile the lambda and add it to the accessor dictionary.
                 var lmb = Expression.Lambda<Action<OSCMappedObject, object[]>>(objAssign, targ, obj).Compile();
