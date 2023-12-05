@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Collections.Frozen;
 using Elements.Core;
 
-namespace Impressive;
+namespace OSCMapper;
 public static class OSCConverters
 {
     // Scan OSCConverters for conversion methods. Must have only 1 parameter of type object[]
