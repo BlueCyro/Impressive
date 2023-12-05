@@ -1,7 +1,5 @@
 using System.Net;
-using FrooxEngine;
 using Rug.Osc;
-using System.Threading;
 
 namespace Impressive;
 
@@ -15,16 +13,23 @@ public class OSCBridge
 
     public bool TryStartListen()
     {
+        Impressive.Msg("Trying to start OSC listener");
         if (listenThread != null && listenThread.ThreadState == ThreadState.Running)
             return false;
         
+        Impressive.Msg("Starting OSC listening thread");
         tkSrc = new();
         try
         {
+            Impressive.Msg("Creating receiver");
             OscReceiver recv = new(IPAddress.Any, Port);
+            Impressive.Msg("Creating thread loop");
             listenThread = new(new ThreadStart(() => ListenLoop(recv, tkSrc.Token)));
+            Impressive.Msg("Connecting receiver");
             recv.Connect();
+            Impressive.Msg("Starting thread");
             listenThread.Start();
+            Impressive.Msg("Thread started, listening!");
             Listening = true;
             return true;
         }
@@ -53,7 +58,7 @@ public class OSCBridge
 
                 if (token.IsCancellationRequested)
                 {
-                    Impressive.Msg($"OSCListener on {recv.LocalEndPoint}");
+                    Impressive.Msg($"OSCListener on {recv.LocalEndPoint} was closed by request.");
                     break;
                 }
                 var packet = recv.Receive();
@@ -65,7 +70,7 @@ public class OSCBridge
         {
             if (recv.State == OscSocketState.Connected)
             {
-                Impressive.Msg($"Exception in listener loop: {ex.Message}");
+                Impressive.Msg($"Exception in listener loop: {ex}");
                 Listening = false;
             }
         }
