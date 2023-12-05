@@ -1,10 +1,6 @@
 ﻿using HarmonyLib;
 using ResoniteModLoader;
-using System;
-using System.Reflection;
 using FrooxEngine;
-using Elements.Core;
-using UnityFrooxEngineRunner;
 
 namespace Impressive;
 
@@ -21,17 +17,9 @@ public partial class Impressive : ResoniteMod
         Harmony harmony = new("net.Cyro.Impressive");
         Config = GetConfiguration();
         Config?.Save(true);
-        harmony.PatchAll();
-    }
-
-    [HarmonyPatch(typeof(FrooxEngineBootstrap))]
-    public static class Bootstrap_Patch
-    {
-        [HarmonyPatch("RegisterDrivers")]
-        [HarmonyPostfix]
-        public static void RegisterDrivers_Patch(Engine engine, UnityLaunchOptions options)
-        {
-            engine.InputInterface.RegisterInputDriver(new SteamLinkDriver());
-        }
+        // harmony.PatchAll();
+        Msg("Patched successfully!");
+        Engine engine = Engine.Current;
+        engine.RunPostInit(() => engine.InputInterface.RegisterInputDriver(new SteamLinkDriver()));
     }
 }
