@@ -1,7 +1,7 @@
 using Elements.Core;
 using FrooxEngine;
 using Rug.Osc;
-using OSCMapper;
+using ReSounding;
 
 namespace Impressive;
 
@@ -31,13 +31,21 @@ public class SteamLinkDriver : IInputDriver
     {
         input = i;
         Impressive.Msg("Attempting to start OSC listener");
-        if (bridge.TryStartListen())
+        try
         {
-            Impressive.Msg("Starting SteamLink datastream!");
-            eyes = new(input, "Steam Link Datastream");
-            bridge.ReceivedPacket += OnNewPacket;
-            Impressive.Port_Config.OnChanged += OnSettingChanged;
-            i.Engine.OnShutdown += Shutdown;
+            if (bridge.TryStartListen())
+            {
+                OSCMapper.RegisterConverters(typeof(OSCTypeConverters));
+                Impressive.Msg("Starting SteamLink datastream!");
+                eyes = new(input, "Steam Link Datastream");
+                bridge.ReceivedPacket += OnNewPacket;
+                Impressive.Port_Config.OnChanged += OnSettingChanged;
+                i.Engine.OnShutdown += Shutdown;
+            }
+        }
+        catch (Exception ex)
+        {
+            Impressive.Msg($"Failed to initialize OSC server! Exception: {ex}");
         }
     }
 
@@ -45,22 +53,31 @@ public class SteamLinkDriver : IInputDriver
     {
         if (packet is OscMessage msg)
         {
-            lock (_lock)
-            {
-                faceData.TryMapOSC(msg.Address, msg.ToArray());
-            }
+            Map(msg.Address, msg.ToArray());
         }
         else if (packet is OscBundle bundle)
         {
-            lock (_lock)
+            foreach (var pkt in bundle)
             {
-                foreach (var pkt in bundle)
+                if (pkt is OscMessage m)
                 {
-                    if (pkt is OscMessage m)
-                    {
-                        faceData.TryMapOSC(m.Address, m.ToArray());
-                    }
+                    Map(m.Address, m.ToArray());
                 }
+            }
+        }
+    }
+
+    void Map(string addr, object[] data)
+    {
+        lock (_lock)
+        {
+            try
+            {
+                OSCMapper.TryMapOSC(faceData, addr, data);
+            }
+            catch (Exception ex)
+            {
+                Impressive.Msg($"Invalid mapping to address \"{addr}\"! Exception: {ex}");
             }
         }
     }
@@ -83,10 +100,10 @@ public class SteamLinkDriver : IInputDriver
     public void UpdateEye(SteamLinkEye source, Eye dest)
     {
         dest.Direction = source.EyeDirection;
-        dest.Widen = source.ExpandedSqueeze;
+        dest.Widen = 0f;
         dest.Openness = source.Eyelid;
         dest.PupilDiameter = 0.003f;
-        dest.Squeeze = source.SqueezeToggle;
+        dest.Squeeze = source.ExpandedSqueeze;
         dest.IsTracking = true;
     }
 
