@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using Elements.Core;
-using OSCMapper;
+using ReSounding;
 
 namespace Impressive;
 public class SteamFace
@@ -22,19 +22,19 @@ public class SteamFace
 
     // Left eye direction
     [OSCMap("/avatar/parameters/LeftEyeX")]
-    private float LeftEyeX { set => EyeLeft.DirX = value; }
+    public float LeftEyeX { set => EyeLeft.SetDirectionFromXY(X: -value); }
 
     [OSCMap("/avatar/parameters/LeftEyeY")]
-    private float LeftEyeY { set => EyeLeft.DirY = value; }
+    public float LeftEyeY { set => EyeLeft.SetDirectionFromXY(Y: -value); }
 
     
 
     // Right eye direction
     [OSCMap("/avatar/parameters/RightEyeX")]
-    private float RightEyeX { set => EyeRight.DirX = value; }
+    public float RightEyeX { set => EyeRight.SetDirectionFromXY(X: -value); }
 
     [OSCMap("/avatar/parameters/RightEyeY")]
-    private float RightEyeY { set => EyeRight.DirY = value; }
+    public float RightEyeY { set => EyeRight.SetDirectionFromXY(Y: -value); }
 
     
 
@@ -44,55 +44,66 @@ public class SteamFace
 
     // Right eyes
     [OSCMap("/avatar/parameters/RightEyeLid")]
-    public float RightEyeLid { set => EyeRight.Eyelid = value; }
+    public float RightEyeLid { set => EyeRight.Eyelid = 1f - MathX.Pow(value, 1.0f / 3.0f); }
 
     [OSCMap("/avatar/parameters/RightEyeLidExpandedSqueeze")]
     public float RightEyeLidExpandedSqueeze { set => EyeRight.ExpandedSqueeze = value; }
 
     [OSCMap("/avatar/parameters/RightEyeSqueezeToggle")]
-    public float RightEyeSqueezeToggle { set => EyeRight.SqueezeToggle = value; }
+    public int RightEyeSqueezeToggle { set => EyeRight.SqueezeToggle = value; }
 
     [OSCMap("/avatar/parameters/RightEyeWidenToggle")]
-    public float RightEyeWidenToggle { set => EyeRight.WidenToggle = value; }
+    public int RightEyeWidenToggle { set => EyeRight.WidenToggle = value; }
 
 
 
     // Left eyes
     [OSCMap("/avatar/parameters/LeftEyeLid")]
-    public float LeftEyeLid { set => EyeLeft.Eyelid = value; }
+    public float LeftEyeLid { set => EyeLeft.Eyelid = 1f - MathX.Pow(value, 1.0f / 3.0f); }
 
     [OSCMap("/avatar/parameters/LeftEyeLidExpandedSqueeze")]
     public float LeftEyeLidExpandedSqueeze { set => EyeLeft.ExpandedSqueeze = value; }
 
     [OSCMap("/avatar/parameters/LeftEyeSqueezeToggle")]
-    public float LeftEyeSqueezeToggle { set => EyeLeft.SqueezeToggle = value; }
+    public int LeftEyeSqueezeToggle { set => EyeLeft.SqueezeToggle = value; }
 
     [OSCMap("/avatar/parameters/LeftEyeWidenToggle")]
-    public float LeftEyeWidenToggle { set => EyeLeft.WidenToggle = value; }
+    public int LeftEyeWidenToggle { set => EyeLeft.WidenToggle = value; }
 
 
 
     [OSCMap("/tracking/eye/EyesClosedAmount")]
-    public float EyesClosedAmount;
+    public float EyesClosedAmount { set => EyeCombined.Eyelid = value; }
 
     #endregion
 }
 
-[StructLayout(LayoutKind.Sequential)]
+
 public struct SteamLinkEye
 {
-    public float3 EyeDirection
-    {
+    private static readonly floatQ compensate = floatQ.Euler(new(0, -90, 0));
 
-        get => new(DirX, DirY, 0f);
-        set { DirX = value.x; DirY = value.y; }
-    }
+    public float3 EyeDirection;
 
-    public float DirX;
-    public float DirY;
+    private float DirX;
+    private float DirY;
 
     public float Eyelid;
+
     public float ExpandedSqueeze;
-    public float WidenToggle;
-    public float SqueezeToggle;
+    public int WidenToggle;
+    public int SqueezeToggle;
+
+    public void SetDirectionFromXY(float? X = null, float? Y = null)
+    {
+        DirX = X ?? DirX;
+        DirY = Y ?? DirY;
+
+        float xAng = MathX.Asin(DirX);
+        float yAng = MathX.Asin(DirY);
+        float xCos = MathX.Cos(xAng);
+        float yCos = MathX.Cos(yAng);
+
+        EyeDirection = compensate * new float3(xCos * yCos, DirY, DirX * yCos);
+    }
 }
