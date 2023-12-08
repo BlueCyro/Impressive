@@ -6,7 +6,7 @@ using System.Reflection;
 namespace OSCMapper;
 public static class OSCMapper
 {
-    // Concurrent dictionary since we do lazy caching for the OSC lookups
+    // Concurrent dictionary since we do lazy caching for the OSC lookups that can come from multiple threads
     private static readonly ConcurrentDictionary<Type, FrozenDictionary<string, Action<object, object[]>>> fieldCaches = new();
 
     // Generates an accessor delegate for field or property members
