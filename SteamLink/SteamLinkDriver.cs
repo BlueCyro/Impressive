@@ -2,7 +2,6 @@ using Elements.Core;
 using FrooxEngine;
 using Rug.Osc;
 using OSCMapper;
-using System.Collections.Concurrent;
 
 namespace Impressive;
 
@@ -13,9 +12,8 @@ public class SteamLinkDriver : IInputDriver
     
     private readonly OSCBridge bridge = new();
     private readonly SteamFace faceData = new();
-
-    private readonly ConcurrentQueue<OscPacket> queue = new();
     
+    private readonly object _lock = new();
     public int UpdateOrder => 150;
     
     public void CollectDeviceInfos(DataTreeList list)
@@ -45,18 +43,16 @@ public class SteamLinkDriver : IInputDriver
 
     void OnNewPacket(object sender, OscPacket packet)
     {
-        queue.Enqueue(packet);
-    }
-
-    public void UpdateInputs(float dt)
-    {
-        while (queue.TryDequeue(out OscPacket packet))
+        if (packet is OscMessage msg)
         {
-            if (packet is OscMessage msg)
+            lock (_lock)
             {
                 faceData.TryMapOSC(msg.Address, msg.ToArray());
             }
-            else if (packet is OscBundle bundle)
+        }
+        else if (packet is OscBundle bundle)
+        {
+            lock (_lock)
             {
                 foreach (var pkt in bundle)
                 {
@@ -67,14 +63,20 @@ public class SteamLinkDriver : IInputDriver
                 }
             }
         }
+    }
 
+    public void UpdateInputs(float dt)
+    {
         if (eyes != null)
         {
             eyes.IsDeviceActive = Impressive.Enabled;
             eyes.IsEyeTrackingActive = Impressive.Enabled;
-            UpdateEye(faceData.EyeLeft, eyes.LeftEye);
-            UpdateEye(faceData.EyeRight, eyes.RightEye);
-            UpdateEye(faceData.EyeCombined, eyes.CombinedEye);
+            lock (_lock)
+            {
+                UpdateEye(faceData.EyeLeft, eyes.LeftEye);
+                UpdateEye(faceData.EyeRight, eyes.RightEye);
+                UpdateEye(faceData.EyeCombined, eyes.CombinedEye);
+            }
         }
     }
 

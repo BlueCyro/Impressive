@@ -9,7 +9,6 @@ public class SteamFace
     public SteamLinkEye EyeRight = new();
     public SteamLinkEye EyeCombined = new();
 
-    #region Eyes
 
     #region EyesDir
 
@@ -75,8 +74,6 @@ public class SteamFace
 
     [OSCMap("/tracking/eye/EyesClosedAmount")]
     public float EyesClosedAmount;
-
-    #endregion
 
     #endregion
 }
