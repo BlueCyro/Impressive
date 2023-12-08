@@ -20,6 +20,16 @@ public partial class Impressive : ResoniteMod
         // harmony.PatchAll();
         Msg("Patched successfully!");
         Engine engine = Engine.Current;
-        engine.RunPostInit(() => engine.InputInterface.RegisterInputDriver(new SteamLinkDriver()));
+        engine.RunPostInit(() => 
+        {
+            try
+            {
+                engine.InputInterface.RegisterInputDriver(new SteamLinkDriver());
+            }
+            catch (Exception ex)
+            {
+                Msg($"Failed to initialize SteamLink driver! Exception: {ex}");
+            }
+        });
     }
 }
