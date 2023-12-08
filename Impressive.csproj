@@ -38,6 +38,9 @@
     <Reference Include="UnityFrooxEngineRunner">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\UnityFrooxEngineRunner.dll</HintPath>
     </Reference>
+    <Reference Include="Re-Sounding">
+      <HintPath>C:\Users\Cyro\Documents\Coding Stuff\Cyro Libraries\Re-Sounding\bin\Release\net472\Re-Sounding.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
