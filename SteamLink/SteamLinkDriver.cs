@@ -38,9 +38,9 @@ public class SteamLinkDriver : IInputDriver
         // Mouth tracking
         DataTreeDictionary mouthDict = new();
 
-        eyeDict.Add("Name", "SteamLink Face Datastream");
-        eyeDict.Add("Type", "Lip Tracking");
-        eyeDict.Add("Model", "SteamLink");
+        mouthDict.Add("Name", "SteamLink Face Datastream");
+        mouthDict.Add("Type", "Lip Tracking");
+        mouthDict.Add("Model", "SteamLink");
         list.Add(mouthDict);
     }
 
@@ -166,10 +166,13 @@ public class SteamLinkDriver : IInputDriver
 
     public void UpdateFace(Mouth mouth)
     {
+        mouth.IsDeviceActive = true;
+        mouth.IsTracking = true;
         mouth.CheekLeftPuffSuck = faceData.CheekPuffSuckL;
         mouth.CheekRightPuffSuck = faceData.CheekPuffSuckR;
         mouth.Jaw = faceData.JawPos;
-        mouth.JawOpen = faceData.JawOpen;
+        mouth.JawOpen = faceData.JawDown - faceData.LipsToward;
+        mouth.MouthPout = (faceData.LipPuckerL + faceData.LipPuckerR) * 0.5f;
     }
 
 

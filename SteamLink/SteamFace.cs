@@ -5,11 +5,12 @@ namespace Impressive;
 
 public class SteamFace
 {
-    public float CheekPuffSuckL => CheekPuffL + CheekSuckL;
-    public float CheekPuffSuckR => CheekPuffR + CheekSuckR;
-    public float3 JawPos => new(JawLeft + JawRight, JawOpen, JawForward);
+    public float CheekPuffSuckL => CheekPuffL - CheekSuckL;
+    public float CheekPuffSuckR => CheekPuffR - CheekSuckR;
+    public float3 JawPos => new(JawRight - JawLeft, -JawDown, JawForward);
 
 
+    // Cheeks
     [OSCMap("/sl/xrfb/facew/CheekPuffL")]
     public float CheekPuffL;
 
@@ -23,6 +24,8 @@ public class SteamFace
     public float CheekSuckR;
 
 
+
+    // Jaw
     [OSCMap("/sl/xrfb/facew/JawSidewaysLeft")]
     public float JawLeft;
 
@@ -30,8 +33,19 @@ public class SteamFace
     public float JawRight;
 
     [OSCMap("/sl/xrfb/facew/JawDrop")]
-    public float JawOpen;
+    public float JawDown;
 
     [OSCMap("/sl/xrfb/facew/JawThrust")]
     public float JawForward;
+
+
+    // Lips
+    [OSCMap("/sl/xrfb/facew/LipsToward")]
+    public float LipsToward; // Whether the lips are closed when the jaw is down
+
+    [OSCMap("/sl/xrfb/facew/LipPuckerL")]
+    public float LipPuckerL;
+
+    [OSCMap("/sl/xrfb/facew/LipPuckerR")]
+    public float LipPuckerR;
 }
