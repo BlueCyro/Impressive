@@ -6,7 +6,7 @@ namespace Impressive;
 public partial class Impressive : ResoniteMod
 {
     [AutoRegisterConfigKey]
-    internal static ModConfigurationKey<bool> Enabled_Config = new("Enabled", "When checked, enables listening on the specified OSC port");
+    internal static ModConfigurationKey<bool> Enabled_Config = new("Enabled", "When checked, enables listening on the specified OSC port", () => true);
     public static bool Enabled => Config!.GetValue(Enabled_Config);
     
     [AutoRegisterConfigKey]
