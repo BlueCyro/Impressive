@@ -10,5 +10,5 @@ public partial class Impressive : ResoniteMod
     public static bool Enabled => Config!.GetValue(Enabled_Config);
     
     [AutoRegisterConfigKey]
-    internal static ModConfigurationKey<int> Port_Config = new("Port", "The port on which OSC will listen", () => 8000);
+    internal static ModConfigurationKey<int> Port_Config = new("Port", "The port on which OSC will listen", () => 9000);
 }

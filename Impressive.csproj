@@ -9,7 +9,8 @@
 
   <!--This will test for the default Steam installation paths for Resonite on Windows and Linux.-->
   <PropertyGroup Condition="'$(ResonitePath)'==''">
-    <ResonitePath>C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath> 
+    <ResonitePath Condition="'$(OS)' == 'Windows_NT' and Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')">C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath> 
+    <ResonitePath Condition="'$(OS)' != 'Windows_NT' and Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
     <!--If neither path above exists, you can define your custom Resonite install directory here -->
     <ResonitePath Condition="'$(ResonitePath)'==''">/Custom/Resonite/Install/Path</ResonitePath>
   </PropertyGroup>
@@ -39,7 +40,7 @@
       <HintPath>$(ResonitePath)Resonite_Data\Managed\UnityFrooxEngineRunner.dll</HintPath>
     </Reference>
     <Reference Include="Re-Sounding">
-      <HintPath>C:\Users\Cyro\Documents\Coding Stuff\Cyro Libraries\Re-Sounding\bin\Release\net472\Re-Sounding.dll</HintPath>
+      <HintPath>$(ResonitePath)rml_libs\Re-Sounding.dll</HintPath>
     </Reference>
   </ItemGroup>
 
