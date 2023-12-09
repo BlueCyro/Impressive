@@ -2,6 +2,7 @@ using Elements.Core;
 using FrooxEngine;
 using Rug.Osc;
 using ReSounding;
+using System.Data.Common;
 
 namespace Impressive;
 
@@ -9,25 +10,40 @@ public class SteamLinkDriver : IInputDriver
 {
     private InputInterface? input;
     private Eyes? eyes;
+    private Mouth? mouth;
     
     private readonly OSCBridge bridge = new();
-    private readonly SteamEyes faceData = new();
+    private readonly SteamEyes eyeData = new();
+    private readonly SteamFace faceData = new();
     
     private readonly object _lock = new();
     public int UpdateOrder => 150;
     
     public DateTime DEBUG_TIME = DateTime.Now;
 
+
     public void CollectDeviceInfos(DataTreeList list)
     {
         Impressive.Msg("Collecting SteamLink device info");
-        DataTreeDictionary dict = new();
 
-        dict.Add("Name", "SteamLink Eye Datastream");
-        dict.Add("Type", "Eye Tracking");
-        dict.Add("Model", "SteamLink");
-        list.Add(dict);
+        // Eye tracking
+        DataTreeDictionary eyeDict = new();
+
+        eyeDict.Add("Name", "SteamLink Eye Datastream");
+        eyeDict.Add("Type", "Eye Tracking");
+        eyeDict.Add("Model", "SteamLink");
+        list.Add(eyeDict);
+
+
+        // Mouth tracking
+        DataTreeDictionary mouthDict = new();
+
+        eyeDict.Add("Name", "SteamLink Face Datastream");
+        eyeDict.Add("Type", "Lip Tracking");
+        eyeDict.Add("Model", "SteamLink");
+        list.Add(mouthDict);
     }
+
 
     public void RegisterInputs(InputInterface i)
     {
@@ -37,9 +53,14 @@ public class SteamLinkDriver : IInputDriver
         {
             if (bridge.TryStartListen())
             {
-                OSCMapper.RegisterConverters(typeof(OSCTypeConverters));
+                OSCMapper.RegisterConverters(typeof(OSCTypeConverters)); // Register custom type converter(s)
                 Impressive.Msg("Starting SteamLink datastream!");
+
+                // Register eye and mouth tracking devices
                 eyes = new(input, "Steam Link Datastream");
+                mouth = new(input, "Steam Link Datastream");
+
+                // Subscribe events for receiving packets, changing config options, and shutting down
                 bridge.ReceivedPacket += OnNewPacket;
                 Impressive.Port_Config.OnChanged += OnSettingChanged;
                 i.Engine.OnShutdown += Shutdown;
@@ -50,6 +71,7 @@ public class SteamLinkDriver : IInputDriver
             Impressive.Msg($"Failed to initialize OSC server! Exception: {ex}");
         }
     }
+
 
     void OnNewPacket(object sender, OscPacket packet)
     {
@@ -69,6 +91,7 @@ public class SteamLinkDriver : IInputDriver
             }
         }
     }
+
 
     void DEBUG_TRY_LOG(OscPacket pckt)
     {
@@ -95,12 +118,14 @@ public class SteamLinkDriver : IInputDriver
         }
     }
 
+
     void Map(string addr, object[] data)
     {
         lock (_lock)
         {
             try
             {
+                OSCMapper.TryMapOSC(eyeData, addr, data);
                 OSCMapper.TryMapOSC(faceData, addr, data);
             }
             catch (Exception ex)
@@ -110,6 +135,7 @@ public class SteamLinkDriver : IInputDriver
         }
     }
 
+
     public void UpdateInputs(float dt)
     {
         if (eyes != null)
@@ -118,12 +144,13 @@ public class SteamLinkDriver : IInputDriver
             eyes.IsEyeTrackingActive = Impressive.Enabled;
             lock (_lock)
             {
-                UpdateEye(faceData.EyeLeft, eyes.LeftEye);
-                UpdateEye(faceData.EyeRight, eyes.RightEye);
-                UpdateEye(faceData.EyeCombined, eyes.CombinedEye);
+                UpdateEye(eyeData.EyeLeft, eyes.LeftEye);
+                UpdateEye(eyeData.EyeRight, eyes.RightEye);
+                UpdateEye(eyeData.EyeCombined, eyes.CombinedEye);
             }
         }
     }
+
 
     public void UpdateEye(SteamLinkEye source, Eye dest)
     {
@@ -135,11 +162,13 @@ public class SteamLinkDriver : IInputDriver
         dest.IsTracking = true;
     }
 
+
     private void OnSettingChanged(object? o)
     {
         bridge.StopListen();
         bridge.TryStartListen();
     }
+
 
     private void Shutdown()
     {
