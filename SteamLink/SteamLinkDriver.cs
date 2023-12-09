@@ -170,8 +170,8 @@ public class SteamLinkDriver : IInputDriver
         mouth.IsTracking = true;
         mouth.CheekLeftPuffSuck = faceData.CheekPuffSuckL;
         mouth.CheekRightPuffSuck = faceData.CheekPuffSuckR;
-        mouth.Jaw = faceData.JawPos;
         mouth.JawOpen = faceData.JawDown - faceData.LipsToward;
+        mouth.Jaw = faceData.JawPos + new float3(0f, mouth.JawOpen, 0f); // Negate jaw open if the jaw & lips are actually open so we don't keep the ape face.
         mouth.MouthPout = (faceData.LipPuckerL + faceData.LipPuckerR) * 0.5f;
     }
 
