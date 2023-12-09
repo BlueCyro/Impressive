@@ -138,7 +138,7 @@ public class SteamLinkDriver : IInputDriver
 
     public void UpdateInputs(float dt)
     {
-        if (eyes != null)
+        if (eyes != null && mouth != null)
         {
             eyes.IsDeviceActive = Impressive.Enabled;
             eyes.IsEyeTrackingActive = Impressive.Enabled;
@@ -147,6 +147,7 @@ public class SteamLinkDriver : IInputDriver
                 UpdateEye(eyeData.EyeLeft, eyes.LeftEye);
                 UpdateEye(eyeData.EyeRight, eyes.RightEye);
                 UpdateEye(eyeData.EyeCombined, eyes.CombinedEye);
+                UpdateFace(mouth);
             }
         }
     }
@@ -160,6 +161,15 @@ public class SteamLinkDriver : IInputDriver
         dest.PupilDiameter = 0.004f;
         dest.Squeeze = 0f;
         dest.IsTracking = true;
+    }
+
+
+    public void UpdateFace(Mouth mouth)
+    {
+        mouth.CheekLeftPuffSuck = faceData.CheekPuffSuckL;
+        mouth.CheekRightPuffSuck = faceData.CheekPuffSuckR;
+        mouth.Jaw = faceData.JawPos;
+        mouth.JawOpen = faceData.JawOpen;
     }
 
 
