@@ -11,11 +11,13 @@ public class SteamLinkDriver : IInputDriver
     private Eyes? eyes;
     
     private readonly OSCBridge bridge = new();
-    private readonly SteamFace faceData = new();
+    private readonly SteamEyes faceData = new();
     
     private readonly object _lock = new();
     public int UpdateOrder => 150;
     
+    public DateTime DEBUG_TIME = DateTime.Now;
+
     public void CollectDeviceInfos(DataTreeList list)
     {
         Impressive.Msg("Collecting SteamLink device info");
@@ -51,6 +53,7 @@ public class SteamLinkDriver : IInputDriver
 
     void OnNewPacket(object sender, OscPacket packet)
     {
+        // DEBUG_TRY_LOG(packet);
         if (packet is OscMessage msg)
         {
             Map(msg.Address, msg.ToArray());
@@ -64,6 +67,31 @@ public class SteamLinkDriver : IInputDriver
                     Map(m.Address, m.ToArray());
                 }
             }
+        }
+    }
+
+    void DEBUG_TRY_LOG(OscPacket pckt)
+    {
+        if (DateTime.Now - DEBUG_TIME < TimeSpan.FromSeconds(2f))
+            return;
+        
+        DEBUG_TIME = DateTime.Now;
+        if (pckt is OscMessage msg)
+        {
+            Impressive.Msg("---- DEBUG MESSAGE ----");
+            Impressive.Msg(msg);
+            Impressive.Msg("---- END MSG ----");
+            Impressive.Msg("");
+        }
+        else if (pckt is OscBundle bnd)
+        {
+            Impressive.Msg("---- DEBUG BUNDLE ----");
+            foreach (var pkt in bnd)
+            {
+                Impressive.Msg(pkt);
+            }
+            Impressive.Msg("---- END BUNDLE ----");
+            Impressive.Msg("");
         }
     }
 
@@ -100,10 +128,10 @@ public class SteamLinkDriver : IInputDriver
     public void UpdateEye(SteamLinkEye source, Eye dest)
     {
         dest.Direction = source.EyeDirection;
-        dest.Widen = 0f;
+        dest.Widen = source.ExpandedSqueeze;
         dest.Openness = source.Eyelid;
-        dest.PupilDiameter = 0.003f;
-        dest.Squeeze = source.ExpandedSqueeze;
+        dest.PupilDiameter = 0.004f;
+        dest.Squeeze = 0f;
         dest.IsTracking = true;
     }
 
