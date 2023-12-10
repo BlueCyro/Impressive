@@ -15,8 +15,8 @@ public class SteamFace
     public float LipBottomOverturn => (LipFunnelBottomL + LipFunnelBottomR) * 0.5f;
     public float LipTopOverturn => (LipFunnelTopL + LipFunnelTopR) * 0.5f;
 
-    public float LipTopOverUnder => (LipSuckTopL + LipSuckTopR) * 0.5f;
-    public float LipBottomOverUnder => (LipSuckBottomL + LipSuckBottomR) * 0.5f;
+    public float LipSuckTop => (LipSuckTopL + LipSuckTopR) * 0.5f;
+    public float LipSuckbottom => (LipSuckBottomL + LipSuckBottomR) * 0.5f;
 
 
     // Cheeks
@@ -46,6 +46,14 @@ public class SteamFace
 
     [OSCMap("/sl/xrfb/facew/JawThrust")]
     public float JawForward;
+
+
+    // Mouth Left/Right
+    [OSCMap("/sl/xrfb/facew/MouthLeft")]
+    public float MouthLeft;
+
+    [OSCMap("/sl/xrfb/facew/MouthRight")]
+    public float MouthRight;
 
 
 
