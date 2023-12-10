@@ -166,6 +166,10 @@ public class SteamLinkDriver : IInputDriver
         }
         else
         {
+            dest.Openness = 1f;
+            dest.Widen = 0f;
+            dest.Squeeze = 0f;
+            dest.Direction = float3.Forward;
             dest.IsTracking = false;
         }
     }
@@ -191,8 +195,11 @@ public class SteamLinkDriver : IInputDriver
         mouth.LipBottomOverturn = faceData.LipBottomOverturn;
         mouth.LipTopOverturn = faceData.LipTopOverturn;
 
-        mouth.LipTopOverUnder = faceData.LipTopOverUnder;
-        mouth.LipBottomOverUnder = faceData.LipBottomOverUnder;
+        mouth.LipTopOverUnder = faceData.LipSuckbottom;
+        mouth.LipBottomOverUnder = faceData.LipSuckTop;
+
+        mouth.LipUpperHorizontal = faceData.MouthRight - faceData.MouthLeft;
+        mouth.LipLowerHorizontal = faceData.MouthRight - faceData.MouthLeft;
     }
 
 
