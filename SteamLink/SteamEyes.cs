@@ -29,7 +29,7 @@ public class SteamEyes
         }
     }
 
-    private float3 _lastValidCombined;
+    private float3 _lastValidCombined = float3.Forward;
 
     
     #region EyesDir
