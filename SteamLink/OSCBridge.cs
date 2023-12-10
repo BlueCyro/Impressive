@@ -35,7 +35,7 @@ public class OSCBridge
         }
         catch (Exception ex)
         {
-            Impressive.Msg($"Exception initializing OSCBridge: {ex.Message}");
+            Impressive.Msg($"Exception initializing OSCBridge: {ex}");
             Listening = false;
             return false;
         }
