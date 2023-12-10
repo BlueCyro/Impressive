@@ -8,6 +8,15 @@ public class SteamFace
     public float CheekPuffSuckL => CheekPuffL - CheekSuckL;
     public float CheekPuffSuckR => CheekPuffR - CheekSuckR;
     public float3 JawPos => new(JawRight - JawLeft, -JawDown, JawForward);
+    
+    public float SmileFrownLeft => SmileL - FrownL;
+    public float SmileFrownRight => SmileR - FrownR;
+
+    public float LipBottomOverturn => (LipFunnelBottomL + LipFunnelBottomR) * 0.5f;
+    public float LipTopOverturn => (LipFunnelTopL + LipFunnelTopR) * 0.5f;
+
+    public float LipTopOverUnder => (LipSuckTopL + LipSuckTopR) * 0.5f;
+    public float LipBottomOverUnder => (LipSuckBottomL + LipSuckBottomR) * 0.5f;
 
 
     // Cheeks
@@ -39,6 +48,7 @@ public class SteamFace
     public float JawForward;
 
 
+
     // Lips
     [OSCMap("/sl/xrfb/facew/LipsToward")]
     public float LipsToward; // Whether the lips are closed when the jaw is down
@@ -48,4 +58,55 @@ public class SteamFace
 
     [OSCMap("/sl/xrfb/facew/LipPuckerR")]
     public float LipPuckerR;
+
+    [OSCMap("/sl/xrfb/facew/LowerLipDepressorL")]
+    public float LowerLeftLip;
+
+    [OSCMap("/sl/xrfb/facew/LowerLipDepressorR")]
+    public float LowerRightLip;
+
+    [OSCMap("/sl/xrfb/facew/UpperLipRaiserL")]
+    public float RaiseLeftLip;
+
+    [OSCMap("/sl/xrfb/facew/UpperLipRaiserR")]
+    public float RaiseRightLip;
+
+    [OSCMap("/sl/xrfb/facew/LipFunnelerLB")]
+    public float LipFunnelBottomL;
+
+    [OSCMap("/sl/xrfb/facew/LipFunnelerRB")]
+    public float LipFunnelBottomR;
+
+    [OSCMap("/sl/xrfb/facew/LipFunnelerLT")]
+    public float LipFunnelTopL;
+
+    [OSCMap("/sl/xrfb/facew/LipFunnelerRT")]
+    public float LipFunnelTopR;
+
+    [OSCMap("/sl/xrfb/facew/LipSuckLB")]
+    public float LipSuckBottomL;
+
+    [OSCMap("/sl/xrfb/facew/LipSuckRB")]
+    public float LipSuckBottomR;
+
+    [OSCMap("/sl/xrfb/facew/LipSuckLT")]
+    public float LipSuckTopL;
+
+    [OSCMap("/sl/xrfb/facew/LipSuckRT")]
+    public float LipSuckTopR;
+
+
+    //Smiling/Frowning
+    [OSCMap("/sl/xrfb/facew/LipCornerPullerL")]
+    public float SmileL;
+
+    [OSCMap("/sl/xrfb/facew/LipCornerPullerR")]
+    public float SmileR;
+
+    [OSCMap("/sl/xrfb/facew/LipCornerDepressorL")]
+    public float FrownL;
+
+    [OSCMap("/sl/xrfb/facew/LipCornerDepressorR")]
+    public float FrownR;
+
 }
