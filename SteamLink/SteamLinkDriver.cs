@@ -155,12 +155,19 @@ public class SteamLinkDriver : IInputDriver
 
     public void UpdateEye(SteamLinkEye source, Eye dest)
     {
-        dest.Direction = source.EyeDirection;
-        dest.Widen = source.ExpandedSqueeze;
-        dest.Openness = source.Eyelid;
-        dest.PupilDiameter = 0.004f;
-        dest.Squeeze = 0f;
-        dest.IsTracking = true;
+        if (source.IsValid)
+        {
+            dest.Direction = source.EyeDirection;
+            dest.Widen = source.ExpandedSqueeze;
+            dest.Openness = source.Eyelid;
+            dest.PupilDiameter = 0.004f;
+            dest.Squeeze = 0f;
+            dest.IsTracking = true;
+        }
+        else
+        {
+            dest.IsTracking = false;
+        }
     }
 
 
@@ -173,6 +180,19 @@ public class SteamLinkDriver : IInputDriver
         mouth.JawOpen = faceData.JawDown - faceData.LipsToward;
         mouth.Jaw = faceData.JawPos + new float3(0f, mouth.JawOpen, 0f); // Negate jaw open if the jaw & lips are actually open so we don't keep the ape face.
         mouth.MouthPout = (faceData.LipPuckerL + faceData.LipPuckerR) * 0.5f;
+        mouth.MouthLeftSmileFrown = faceData.SmileFrownLeft;
+        mouth.MouthRightSmileFrown = faceData.SmileFrownRight;
+
+        mouth.LipUpperLeftRaise = faceData.RaiseLeftLip;
+        mouth.LipUpperRightRaise = faceData.RaiseRightLip;
+        mouth.LipLowerLeftRaise = faceData.LowerLeftLip;
+        mouth.LipLowerRightRaise = faceData.LowerRightLip;
+
+        mouth.LipBottomOverturn = faceData.LipBottomOverturn;
+        mouth.LipTopOverturn = faceData.LipTopOverturn;
+
+        mouth.LipTopOverUnder = faceData.LipTopOverUnder;
+        mouth.LipBottomOverUnder = faceData.LipBottomOverUnder;
     }
 
 
