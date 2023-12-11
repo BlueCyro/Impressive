@@ -17,7 +17,7 @@ public class SteamLinkDriver : IInputDriver
     private readonly SteamFace faceData = new();
     
     private readonly object _lock = new();
-    public int UpdateOrder => 150;
+    public int UpdateOrder => 150; // Realistically, I have no idea what this is supposed to do. :(
     
     public DateTime DEBUG_TIME = DateTime.Now;
 
@@ -147,6 +147,9 @@ public class SteamLinkDriver : IInputDriver
                 UpdateEye(eyeData.EyeLeft, eyes.LeftEye);
                 UpdateEye(eyeData.EyeRight, eyes.RightEye);
                 UpdateEye(eyeData.EyeCombined, eyes.CombinedEye);
+                eyes.ComputeCombinedEyeParameters();
+                eyes.FinishUpdate();
+
                 UpdateFace(mouth);
             }
         }
@@ -157,7 +160,8 @@ public class SteamLinkDriver : IInputDriver
     {
         if (source.IsValid)
         {
-            dest.Direction = source.EyeDirection;
+            dest.UpdateWithRotation(source.EyeRotation);
+
             dest.Widen = source.ExpandedSqueeze;
             dest.Openness = source.Eyelid;
             dest.PupilDiameter = 0.004f;
