@@ -8,8 +8,8 @@ public partial class Impressive : ResoniteMod
 {
     public override string Name => "Impressive";
     public override string Author => "Cyro";
-    public override string Version => "1.0.0";
-    public override string Link => "???";
+    public override string Version => "1.0.1";
+    public override string Link => "https://github.com/RileyGuy/Impressive";
     public static ModConfiguration? Config;
 
     public override void OnEngineInit()
