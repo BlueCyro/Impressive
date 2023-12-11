@@ -9,27 +9,26 @@ public class SteamEyes
     public SteamLinkEye EyeRight = new();
     public SteamLinkEye EyeCombined => new()
     {
-        Eyelid = MathX.Min(EyeLeft.Eyelid, EyeRight.Eyelid),
-        EyeDirection = CombinedEyesDir,
-        ExpandedSqueeze = MathX.Max(EyeLeft.ExpandedSqueeze, EyeRight.ExpandedSqueeze)
+        Eyelid = MathX.Max(EyeLeft.Eyelid, EyeRight.Eyelid),
+        EyeRotation = CombinedEyesDir
     };
 
-    public float3 CombinedEyesDir
+    public floatQ CombinedEyesDir
     {
         get
         {
             if(EyeLeft.IsValid && EyeRight.IsValid && EyeLeft.IsTracking && EyeRight.IsTracking)
-                _lastValidCombined =  MathX.Slerp(EyeLeft.EyeDirection, EyeRight.EyeDirection, 0.5f);
+                _lastValidCombined = MathX.Slerp(EyeLeft.EyeRotation, EyeRight.EyeRotation, 0.5f);
             else if (EyeLeft.IsValid && EyeLeft.IsTracking)
-                _lastValidCombined = EyeLeft.EyeDirection;
+                _lastValidCombined = EyeLeft.EyeRotation;
             else if (EyeRight.IsValid && EyeRight.IsTracking)
-                _lastValidCombined = EyeRight.EyeDirection;
+                _lastValidCombined = EyeRight.EyeRotation;
 
             return _lastValidCombined;
         }
     }
 
-    private float3 _lastValidCombined = float3.Forward;
+    private floatQ _lastValidCombined = floatQ.Identity;
 
     
     #region EyesDir
@@ -37,19 +36,19 @@ public class SteamEyes
 
     // Left eye direction
     [OSCMap("/avatar/parameters/LeftEyeX")]
-    public float LeftEyeX { set => EyeLeft.SetDirectionFromXY(X: -value); }
+    public float LeftEyeX { set => EyeLeft.SetDirectionFromXY(X: value); }
 
     [OSCMap("/avatar/parameters/LeftEyeY")]
-    public float LeftEyeY { set => EyeLeft.SetDirectionFromXY(Y: -value); }
+    public float LeftEyeY { set => EyeLeft.SetDirectionFromXY(Y: value); }
 
     
 
     // Right eye direction
     [OSCMap("/avatar/parameters/RightEyeX")]
-    public float RightEyeX { set => EyeRight.SetDirectionFromXY(X: -value); }
+    public float RightEyeX { set => EyeRight.SetDirectionFromXY(X: value); }
 
     [OSCMap("/avatar/parameters/RightEyeY")]
-    public float RightEyeY { set => EyeRight.SetDirectionFromXY(Y: -value); }
+    public float RightEyeY { set => EyeRight.SetDirectionFromXY(Y: value); }
 
     
 
@@ -61,7 +60,7 @@ public class SteamEyes
     [OSCMap("/avatar/parameters/RightEyeLid")]
     public float RightEyeLid { set => EyeRight.Eyelid = 1f - MathX.Pow(value, 1.0f / 3.0f); }
 
-    [OSCMap("/sl/xrfb/facew/UpperLidRaiserR")] // This particular parameter seems to be both for eyebrows *and* for eye widening.
+    [OSCMap("/sl/xrfb/facew/UpperLidRaiserR")]
     public float RightEyeLidExpandedSqueeze { set => EyeRight.ExpandedSqueeze = value; }
 
 
@@ -90,6 +89,7 @@ public class SteamEyes
 
     #endregion
 }
+
 public struct SteamLinkEye
 {
     private static readonly floatQ compensate = floatQ.Euler(new(0, -90, 0));
@@ -98,7 +98,13 @@ public struct SteamLinkEye
 
     public readonly bool IsValid => EyeDirection.Magnitude > 0f && MathX.IsValid(EyeDirection);
 
-    public float3 EyeDirection;
+    public float3 EyeDirection
+    {
+        readonly get => EyeRotation * float3.Forward;
+        set => EyeRotation = floatQ.LookRotation(EyeDirection);
+    }
+
+    public floatQ EyeRotation;
 
     private float DirX;
     private float DirY;
@@ -114,12 +120,11 @@ public struct SteamLinkEye
         DirX = X ?? DirX;
         DirY = Y ?? DirY;
 
-        // I don't actually know if this is right, but it looks basically perfect
+        // Get the angles out of the eye look
         float xAng = MathX.Asin(DirX);
         float yAng = MathX.Asin(DirY);
-        float xCos = MathX.Cos(xAng);
-        float yCos = MathX.Cos(yAng);
 
-        EyeDirection = (compensate * new float3(xCos * yCos, DirY, DirX * yCos)).Normalized;
+        // Convert to cartesian coordinates
+        EyeRotation = floatQ.Euler(yAng * MathX.Rad2Deg, xAng * MathX.Rad2Deg, 0f);
     }
 }
