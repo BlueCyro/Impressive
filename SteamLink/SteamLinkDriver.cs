@@ -142,15 +142,21 @@ public class SteamLinkDriver : IInputDriver
         {
             eyes.IsDeviceActive = Impressive.Enabled;
             eyes.IsEyeTrackingActive = Impressive.Enabled;
-            lock (_lock)
-            {
-                UpdateEye(eyeData.EyeLeft, eyes.LeftEye);
-                UpdateEye(eyeData.EyeRight, eyes.RightEye);
-                UpdateEye(eyeData.EyeCombined, eyes.CombinedEye);
-                eyes.ComputeCombinedEyeParameters();
-                eyes.FinishUpdate();
+            mouth.IsDeviceActive = Impressive.Enabled;
+            mouth.IsTracking = Impressive.Enabled;
 
-                UpdateFace(mouth);
+            if (Impressive.Enabled)
+            {
+                lock (_lock)
+                {
+                    UpdateEye(eyeData.EyeLeft, eyes.LeftEye);
+                    UpdateEye(eyeData.EyeRight, eyes.RightEye);
+                    UpdateEye(eyeData.EyeCombined, eyes.CombinedEye);
+                    eyes.ComputeCombinedEyeParameters();
+                    eyes.FinishUpdate();
+
+                    UpdateFace(mouth);
+                }
             }
         }
     }
