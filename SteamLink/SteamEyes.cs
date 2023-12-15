@@ -58,7 +58,7 @@ public class SteamEyes
 
     // Right eyes
     [OSCMap("/avatar/parameters/RightEyeLid")]
-    public float RightEyeLid { set => EyeRight.Eyelid = 1f - MathX.Pow(value, 1.0f / 3.0f); }
+    public float RightEyeLid { set => EyeRight.Eyelid = 1f - MathX.Sqrt(value); }
 
     [OSCMap("/sl/xrfb/facew/UpperLidRaiserR")]
     public float RightEyeLidExpandedSqueeze { set => EyeRight.ExpandedSqueeze = value; }
@@ -92,8 +92,6 @@ public class SteamEyes
 
 public struct SteamLinkEye
 {
-    private static readonly floatQ compensate = floatQ.Euler(new(0, -90, 0));
-
     public readonly bool IsTracking => IsValid && Eyelid > 0.1f;
 
     public readonly bool IsValid => EyeDirection.Magnitude > 0f && MathX.IsValid(EyeDirection);
