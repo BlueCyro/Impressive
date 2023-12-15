@@ -138,10 +138,11 @@ public class SteamLinkDriver : IInputDriver
 
     public void UpdateInputs(float dt)
     {
-        if (eyes != null && mouth != null)
+        if (eyes != null && mouth != null && input != null)
         {
-            bool enabled = Impressive.Enabled && (input?.VR_Active ?? false);
-            eyes.SetTracking(enabled);
+            bool enabled = Impressive.Enabled && input.VR_Active;
+            eyes.IsDeviceActive = enabled;
+            eyes.IsEyeTrackingActive = enabled;
             mouth.IsDeviceActive = enabled;
             mouth.IsTracking = enabled;
 
