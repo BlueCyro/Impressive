@@ -74,7 +74,7 @@ public class SteamEyes
 
     // Left eyes
     [OSCMap("/avatar/parameters/LeftEyeLid")]
-    public float LeftEyeLid { set => EyeLeft.Eyelid = 1f - MathX.Pow(value, 1.0f / 3.0f); }
+    public float LeftEyeLid { set => EyeLeft.Eyelid = 1f - MathX.Sqrt(value); }
 
     [OSCMap("/sl/xrfb/facew/UpperLidRaiserL")]
     public float LeftEyeLidExpandedSqueeze { set => EyeLeft.ExpandedSqueeze = value; }
