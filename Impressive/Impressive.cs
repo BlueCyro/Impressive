@@ -8,7 +8,7 @@ public partial class Impressive : ResoniteMod
 {
     public override string Name => "Impressive";
     public override string Author => "Cyro";
-    public override string Version => "1.0.2";
+    public override string Version => typeof(Impressive).Assembly.GetName().Version.ToString();
     public override string Link => "https://github.com/RileyGuy/Impressive";
     public static ModConfiguration? Config;
 

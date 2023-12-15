@@ -5,6 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>11</LangVersion>
+    <Version>1.0.2</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <Authors>Cyro</Authors>
+    <Product>Impressive SteamLink Interface</Product>
+    <Description>SteamLink OSC face and eye tracking support for Resonite</Description>
+    <Copyright>Copyright (c) 2023 Riley Fields</Copyright>
   </PropertyGroup>
 
   <!--This will test for the default Steam installation paths for Resonite on Windows and Linux.-->
