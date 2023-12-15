@@ -66,9 +66,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <OutputFiles Include="$(ResonitePath)rml_libs\Re-Sounding.dll" />
-      <OutputFiles Include="$(ResonitePath)rml_mods\$(TargetFileName)" />
-      <OutputFiles Include="$(ResonitePath)rml_libs\Rug.Osc.dll" />
+      <OutputFiles Include="$(OutDir)Re-Sounding.dll" />
+      <OutputFiles Include="$(OutDir)$(TargetFileName)" />
+      <OutputFiles Include="$(OutDir)Rug.Osc.dll" />
     </ItemGroup>
 
     <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(OutputDirectory)" />
