@@ -117,4 +117,24 @@ public class SteamFace
     [OSCMap("/sl/xrfb/facew/LipCornerDepressorR")]
     public float FrownR;
 
+
+
+    // Tongue
+
+
+    /* 
+    [OSCMap("/sl/xrfb/facew/ToungeTipInterdental")]
+    [OSCMap("/sl/xrfb/facew/FrontDorsalPalate")]
+    [OSCMap("/sl/xrfb/facew/FrontDorsalPalate")]
+    [OSCMap("/sl/xrfb/facew/MidDorsalPalate")]
+    [OSCMap("/sl/xrfb/facew/BackDorsalVelar")]
+    [OSCMap("/sl/xrfb/facew/ToungeRetreat")]
+    [OSCMap("/sl/xrfb/facew/ToungeTipAlveolar")] 
+    */
+
+    // Seems to only support tongue out properly right now.
+    [OSCMap("/sl/xrfb/facew/ToungeOut")]
+    public float TongueOut;
+    
+
 }

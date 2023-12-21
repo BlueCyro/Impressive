@@ -215,6 +215,8 @@ public class SteamLinkDriver : IInputDriver
 
         mouth.LipUpperHorizontal = faceData.MouthRight - faceData.MouthLeft;
         mouth.LipLowerHorizontal = faceData.MouthRight - faceData.MouthLeft;
+
+        mouth.Tongue = new float3(0f, 0f, faceData.TongueOut);
     }
 
 
