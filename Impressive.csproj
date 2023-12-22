@@ -62,15 +62,18 @@
     <Copy SourceFiles="$(OutDir)Re-Sounding.dll" DestinationFolder="$(ResonitePath)rml_libs" />
 
     <PropertyGroup>
-      <OutputDirectory>$(MSBuildProjectDirectory)\..\Output</OutputDirectory>
+      <OutputDirectory>$(MSBuildProjectDirectory)\Release\ImpressiveRelease\Resonite\</OutputDirectory>
+      <OutputParent>$(OutputDirectory)..\</OutputParent>
+      <OutputRoot>$(OutputParent)..\</OutputRoot>
     </PropertyGroup>
 
-    <ItemGroup>
-      <OutputFiles Include="$(OutDir)Re-Sounding.dll" />
-      <OutputFiles Include="$(OutDir)$(TargetFileName)" />
-      <OutputFiles Include="$(OutDir)Rug.Osc.dll" />
-    </ItemGroup>
+    <Copy SourceFiles="$(OutDir)$(TargetFileName)" DestinationFolder="$(OutputDirectory)rml_mods" />
+    <Copy SourceFiles="$(OutDir)Re-Sounding.dll" DestinationFolder="$(OutputDirectory)rml_libs" />
+    <Copy SourceFiles="$(OutDir)Rug.Osc.dll" DestinationFolder="$(OutputDirectory)rml_libs" />
 
-    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(OutputDirectory)" />
+  </Target>
+
+  <Target Name="ZipDirectory" AfterTargets="PostBuild">
+    <Exec Command="powershell -Command &quot;Compress-Archive -Path '$(OutputParent)*' -DestinationPath '$(OutputRoot)Impressive.zip' -Force&quot;" />
   </Target>
 </Project>
