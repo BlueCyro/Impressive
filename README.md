@@ -4,6 +4,8 @@
 
 Resonite now supports *all* of the Quest Pro face tracking blendshapes natively!
 
+-------------------------------------
+
 Impressive is a mod for [Resonite](https://resonite.com) via [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader) which adds support for [Steam Link's](https://store.steampowered.com/app/353380/Steam_Link/) passthrough of face tracking and eye tracking data.
 
 # Setup
